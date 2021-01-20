@@ -94,6 +94,10 @@ public class View extends javax.swing.JFrame {
         jTextFieldCarsOut.enable(false);
         PlainDocument bufferDoc = (PlainDocument) jTextFieldBuffer.getDocument();
         bufferDoc.setDocumentFilter(new MyIntFilter());
+        PlainDocument inDoc = (PlainDocument) jTextFieldCarIn.getDocument();
+        inDoc.setDocumentFilter(new MyIntFilter());
+        PlainDocument outDoc = (PlainDocument) jTextFieldCarsOut.getDocument();
+        outDoc.setDocumentFilter(new MyIntFilter());
     }
 
     /**
@@ -334,7 +338,7 @@ public class View extends javax.swing.JFrame {
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer()));
         representParking(sem.getUsed());
         representQueve(sem.getInQueue());
-        jTextFieldBuffer.setText("");
+        jTextFieldBuffer.setText("0");
     }//GEN-LAST:event_jButtonBufferActionPerformed
 
     private void jButtonCarsInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCarsInActionPerformed
@@ -343,7 +347,7 @@ public class View extends javax.swing.JFrame {
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer() - used));
         representParking(used);
         representQueve(sem.getInQueue());
-        jTextFieldCarIn.setText("");
+        jTextFieldCarIn.setText("0");
     }//GEN-LAST:event_jButtonCarsInActionPerformed
 
     private void jButtonCarsOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCarsOutActionPerformed
@@ -352,7 +356,7 @@ public class View extends javax.swing.JFrame {
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer() - used));
         representParking(used);
         representQueve(sem.getInQueue());
-        jTextFieldCarsOut.setText("");
+        jTextFieldCarsOut.setText("0");
     }//GEN-LAST:event_jButtonCarsOutActionPerformed
 
     Semaphore sem;
