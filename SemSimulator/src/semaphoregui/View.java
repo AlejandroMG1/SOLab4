@@ -13,11 +13,76 @@ import javax.swing.ImageIcon;
 import javax.swing.JLayeredPane;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.PlainDocument;
 
 /**
  *
  * @author AlejoMG
  */
+
+class MyIntFilter extends DocumentFilter {
+   @Override
+   public void insertString(FilterBypass fb, int offset, String string,
+         AttributeSet attr) throws BadLocationException {
+
+      Document doc = fb.getDocument();
+      StringBuilder sb = new StringBuilder();
+      sb.append(doc.getText(0, doc.getLength()));
+      sb.insert(offset, string);
+
+      if (test(sb.toString())) {
+         super.insertString(fb, offset, string, attr);
+      } else {
+         // warn the user and don't allow the insert
+      }
+   }
+
+   private boolean test(String text) {
+      try {
+         Integer.parseInt(text);
+         return true;
+      } catch (NumberFormatException e) {
+         return false;
+      }
+   }
+
+   @Override
+   public void replace(FilterBypass fb, int offset, int length, String text,
+         AttributeSet attrs) throws BadLocationException {
+
+      Document doc = fb.getDocument();
+      StringBuilder sb = new StringBuilder();
+      sb.append(doc.getText(0, doc.getLength()));
+      sb.replace(offset, offset + length, text);
+
+      if (test(sb.toString())) {
+         super.replace(fb, offset, length, text, attrs);
+      } else {
+         // warn the user and don't allow the insert
+      }
+
+   }
+
+   @Override
+   public void remove(FilterBypass fb, int offset, int length)
+         throws BadLocationException {
+      Document doc = fb.getDocument();
+      StringBuilder sb = new StringBuilder();
+      sb.append(doc.getText(0, doc.getLength()));
+      sb.delete(offset, offset + length);
+
+      if (test(sb.toString())) {
+         super.remove(fb, offset, length);
+      } else {
+         // warn the user and don't allow the insert
+      }
+
+   }
+}
 public class View extends javax.swing.JFrame {
 
     /**
@@ -27,6 +92,8 @@ public class View extends javax.swing.JFrame {
         initComponents();
         jTextFieldCarIn.enable(false);
         jTextFieldCarsOut.enable(false);
+        PlainDocument bufferDoc = (PlainDocument) jTextFieldBuffer.getDocument();
+        bufferDoc.setDocumentFilter(new MyIntFilter());
     }
 
     /**
@@ -46,13 +113,14 @@ public class View extends javax.swing.JFrame {
         jTextFieldBuffer = new javax.swing.JTextField();
         jButtonBuffer = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jScrollPaneWait = new javax.swing.JScrollPane();
         jLabelCarsAct = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jPanelPark = new javax.swing.JPanel();
-        jInternalFrame1 = new javax.swing.JInternalFrame();
+        jPanelParkContainer = new javax.swing.JPanel();
+        jPanelParking = new javax.swing.JPanel();
+        jPanelQueveContainer = new javax.swing.JPanel();
+        jPanelQueve = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -85,8 +153,6 @@ public class View extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel2.setText("Espacios libres:");
 
-        jScrollPaneWait.setBackground(new java.awt.Color(255, 255, 255));
-
         jLabelCarsAct.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabelCarsAct.setText("0");
 
@@ -96,31 +162,48 @@ public class View extends javax.swing.JFrame {
 
         jLabel5.setText("Tamaño de buffer");
 
-        jPanelPark.setBackground(new java.awt.Color(255, 255, 255));
-
-        jInternalFrame1.setTitle("Parqueadero");
-        jInternalFrame1.setVisible(true);
-
-        javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
-        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
-        jInternalFrame1Layout.setHorizontalGroup(
-            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelParkingLayout = new javax.swing.GroupLayout(jPanelParking);
+        jPanelParking.setLayout(jPanelParkingLayout);
+        jPanelParkingLayout.setHorizontalGroup(
+            jPanelParkingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        jInternalFrame1Layout.setVerticalGroup(
-            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanelParkingLayout.setVerticalGroup(
+            jPanelParkingLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout jPanelParkLayout = new javax.swing.GroupLayout(jPanelPark);
-        jPanelPark.setLayout(jPanelParkLayout);
-        jPanelParkLayout.setHorizontalGroup(
-            jPanelParkLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jInternalFrame1)
+        javax.swing.GroupLayout jPanelParkContainerLayout = new javax.swing.GroupLayout(jPanelParkContainer);
+        jPanelParkContainer.setLayout(jPanelParkContainerLayout);
+        jPanelParkContainerLayout.setHorizontalGroup(
+            jPanelParkContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanelParking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
-        jPanelParkLayout.setVerticalGroup(
-            jPanelParkLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jInternalFrame1)
+        jPanelParkContainerLayout.setVerticalGroup(
+            jPanelParkContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanelParking, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanelQueveLayout = new javax.swing.GroupLayout(jPanelQueve);
+        jPanelQueve.setLayout(jPanelQueveLayout);
+        jPanelQueveLayout.setHorizontalGroup(
+            jPanelQueveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jPanelQueveLayout.setVerticalGroup(
+            jPanelQueveLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 133, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanelQueveContainerLayout = new javax.swing.GroupLayout(jPanelQueveContainer);
+        jPanelQueveContainer.setLayout(jPanelQueveContainerLayout);
+        jPanelQueveContainerLayout.setHorizontalGroup(
+            jPanelQueveContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanelQueve, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        jPanelQueveContainerLayout.setVerticalGroup(
+            jPanelQueveContainerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanelQueve, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -130,47 +213,47 @@ public class View extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextFieldCarIn, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCarsIn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextFieldBuffer, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonBuffer, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel4)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jTextFieldCarsOut, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButtonCarsOut, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPaneWait, javax.swing.GroupLayout.PREFERRED_SIZE, 282, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTextFieldCarIn, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonCarsIn, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTextFieldBuffer, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonBuffer, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTextFieldCarsOut, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButtonCarsOut, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(41, 41, 41))
+                    .addComponent(jPanelQueveContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 131, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 197, Short.MAX_VALUE)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabelCarsAct)
                         .addGap(129, 129, 129))
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanelPark, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanelParkContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelCarsAct))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabelCarsAct))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanelPark, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 27, Short.MAX_VALUE)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
@@ -191,7 +274,8 @@ public class View extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPaneWait, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanelQueveContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanelParkContainer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -199,22 +283,43 @@ public class View extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void representParking(int used) {
-        jPanelPark.removeAll();
-        jPanelPark.repaint();
-        Rectangle tamaño = jInternalFrame1.getBounds();
-        jInternalFrame1 = new javax.swing.JInternalFrame("Parqueadero", true);
+        jPanelParkContainer.removeAll();
+        jPanelParkContainer.repaint();
+        Rectangle tamaño = jPanelParking.getBounds();
+        jPanelParking = new javax.swing.JPanel();
         for (int i = 0; i < used; i++) {
-            int j = i / 4;
+            int j = i / 6;
             javax.swing.JLabel jCar = new javax.swing.JLabel("");
             jCar.setIcon(img);
-            jCar.setBounds(225 - (110 * j), 175 - (50 * (i % 4)), 105, 50);
-            jInternalFrame1.setLayout(null);
-            jPanelPark.add(jInternalFrame1, JLayeredPane.DEFAULT_LAYER);
-            jInternalFrame1.add(jCar);
+            jCar.setBounds(290 - (110 * j), 280 - (50 * (i % 6)), 105, 50);
+            jPanelParking.setLayout(null);
+            jPanelParkContainer.add(jPanelParking, JLayeredPane.DEFAULT_LAYER);
+            jPanelParking.add(jCar);
         }
-        jInternalFrame1.setVisible(true);
-        jInternalFrame1.setBounds(tamaño);
-        jInternalFrame1.setEnabled(false);
+        jPanelParking.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelParking.setVisible(true);
+        jPanelParking.setBounds(tamaño);
+        jPanelParking.setEnabled(false);
+    }
+    
+    private void representQueve(int used) {
+        jPanelQueveContainer.removeAll();
+        jPanelQueveContainer.repaint();
+        Rectangle tamaño = jPanelQueve.getBounds();
+        jPanelQueve = new javax.swing.JPanel();
+        for (int i = 0; i < used; i++) {
+            int j = i / 2;
+            javax.swing.JLabel jCar = new javax.swing.JLabel("");
+            jCar.setIcon(img);
+            jCar.setBounds(175- (110 * j), 65-(50 * (i % 2)), 105, 50);
+            jPanelQueve.setLayout(null);
+            jPanelQueveContainer.add(jPanelQueve);
+            jPanelQueve.add(jCar);
+        }
+        jPanelQueve.setBackground(new java.awt.Color(204, 204, 204));
+        jPanelQueve.setVisible(true);
+        jPanelQueve.setBounds(tamaño);
+        jPanelQueve.setEnabled(false);
     }
 
     private void jButtonBufferActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonBufferActionPerformed
@@ -227,6 +332,9 @@ public class View extends javax.swing.JFrame {
             sem.setBuffer(buffer);
         }
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer()));
+        representParking(sem.getUsed());
+        representQueve(sem.getInQueue());
+        jTextFieldBuffer.setText("");
     }//GEN-LAST:event_jButtonBufferActionPerformed
 
     private void jButtonCarsInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCarsInActionPerformed
@@ -234,13 +342,17 @@ public class View extends javax.swing.JFrame {
         int used = sem.useBuffer(use);
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer() - used));
         representParking(used);
+        representQueve(sem.getInQueue());
+        jTextFieldCarIn.setText("");
     }//GEN-LAST:event_jButtonCarsInActionPerformed
 
     private void jButtonCarsOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCarsOutActionPerformed
         int free = Integer.parseInt(jTextFieldCarsOut.getText());
         int used = sem.freeBuffer(free);
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer() - used));
-        System.out.println(used);
+        representParking(used);
+        representQueve(sem.getInQueue());
+        jTextFieldCarsOut.setText("");
     }//GEN-LAST:event_jButtonCarsOutActionPerformed
 
     Semaphore sem;
@@ -261,15 +373,16 @@ public class View extends javax.swing.JFrame {
     private javax.swing.JButton jButtonBuffer;
     private javax.swing.JButton jButtonCarsIn;
     private javax.swing.JButton jButtonCarsOut;
-    private javax.swing.JInternalFrame jInternalFrame1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabelCarsAct;
-    private javax.swing.JPanel jPanelPark;
-    private javax.swing.JScrollPane jScrollPaneWait;
+    private javax.swing.JPanel jPanelParkContainer;
+    private javax.swing.JPanel jPanelParking;
+    private javax.swing.JPanel jPanelQueve;
+    private javax.swing.JPanel jPanelQueveContainer;
     private javax.swing.JTextField jTextFieldBuffer;
     private javax.swing.JTextField jTextFieldCarIn;
     private javax.swing.JTextField jTextFieldCarsOut;
