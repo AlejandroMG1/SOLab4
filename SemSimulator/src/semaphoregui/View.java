@@ -46,6 +46,9 @@ class MyIntFilter extends DocumentFilter {
          Integer.parseInt(text);
          return true;
       } catch (NumberFormatException e) {
+         if(text.equals("")){
+             return true;
+         }
          return false;
       }
    }
@@ -338,7 +341,7 @@ public class View extends javax.swing.JFrame {
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer()));
         representParking(sem.getUsed());
         representQueve(sem.getInQueue());
-        jTextFieldBuffer.setText("0");
+        jTextFieldBuffer.setText("");
     }//GEN-LAST:event_jButtonBufferActionPerformed
 
     private void jButtonCarsInActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCarsInActionPerformed
@@ -347,7 +350,7 @@ public class View extends javax.swing.JFrame {
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer() - used));
         representParking(used);
         representQueve(sem.getInQueue());
-        jTextFieldCarIn.setText("0");
+        jTextFieldCarIn.setText("");
     }//GEN-LAST:event_jButtonCarsInActionPerformed
 
     private void jButtonCarsOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCarsOutActionPerformed
@@ -356,7 +359,7 @@ public class View extends javax.swing.JFrame {
         jLabelCarsAct.setText(String.valueOf(sem.getBuffer() - used));
         representParking(used);
         representQueve(sem.getInQueue());
-        jTextFieldCarsOut.setText("0");
+        jTextFieldCarsOut.setText("");
     }//GEN-LAST:event_jButtonCarsOutActionPerformed
 
     Semaphore sem;
